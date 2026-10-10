@@ -13,29 +13,33 @@ import time
 st.set_page_config(page_title="AI Image Enhancer", page_icon="✨", layout="centered")
 
 # Place this right under st.set_page_config(...)
-# Replace your previous st.markdown CSS block with this updated one:
 st.markdown("""
     <style>
-    /* 1. Hide the entire header bar container (removes Github icon, Share, Deploy, etc.) */
+    /* 1. Eliminate the top header area completely (Hides Github profile icon, Share, Deploy) */
     header[data-testid="stHeader"] {
         display: none !important;
+        height: 0px !important;
+        visibility: hidden !important;
     }
     
-    /* 2. Hide the top status menu actions */
-    #MainMenu {visibility: hidden;}
-    .stAppDeployButton {display:none !important;}
-    [data-testid="stAppDeployButton"] {display: none !important;}
-    
-    /* 3. Aggressively remove the bottom owner toolbars and viewer badges */
-    footer {visibility: hidden !important;}
-    viewerBadge {display: none !important;}
-    [data-testid="stManageAppButton"] {display: none !important;}
-    div[data-testid="stDecoration"] {display: none !important;}
-    
-    /* 4. Remove padding from the top so the page looks balanced and premium */
+    /* 2. Target the exact layout wrapper class to clean up top page margins */
     .stAppViewBlockContainer {
-        padding-top: 2rem !important;
+        padding-top: 1.5rem !important;
     }
+
+    /* 3. Aggressively target and hide the new "Hosted with Streamlit" floating menu container */
+    div[class*="viewerToolbar"], 
+    div[class*="embeddedToolbar"], 
+    iframe[title="Hosted with Streamlit"],
+    div[data-testid="stConnectionStatus"],
+    .stActionButton {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* 4. Catch-all for standard footer and status line containers */
+    footer {visibility: hidden !important; display: none !important;}
+    #MainMenu {visibility: hidden !important;}
     </style>
     """, unsafe_allow_html=True)
 
