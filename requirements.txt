@@ -4,3 +4,4 @@ super-image==0.2.0
 opencv-python-headless>=4.8.0.0
 Pillow>=10.4.0
 numpy>=2.0.0
+streamlit-image-comparison==0.0.4
