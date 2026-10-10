@@ -12,6 +12,18 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Image Enhancer", page_icon="✨", layout="centered")
 
+# Place this right under st.set_page_config(...)
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stAppDeployButton {display:none;}
+    [data-testid="stAppDeployButton"] {display: none !important;}
+    viewerBadge {display: none !important;}
+    </style>
+    """, unsafe_allow_html=True)
+
+
 st.title("✨ AI Super-Resolution Image Enhancer")
 st.write("Upload a blurry image and let our Deep Learning model upscale it by 2x section by section.")
 
