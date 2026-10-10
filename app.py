@@ -1,3 +1,7 @@
+import os
+# CRITICAL: Prevent the Linux cloud engine from fragmentation faults during large tensor array initializations
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 import streamlit as st
 import torch
 from super_image import EdsrModel, ImageLoader
@@ -14,14 +18,14 @@ st.write("Upload a blurry image and let our Deep Learning model upscale it by 2x
 # 2. Cache the model loading so it doesn't reload on every button click
 @st.cache_resource
 def load_ai_model():
-    # Force CPU for local running on i3 processors, or use CUDA if available
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # Streamlit Cloud runs on standard CPU backends. Force stable allocation here.
+    device = torch.device('cpu')
     model = EdsrModel.from_pretrained('eugenesiow/edsr-base', scale=2)
     model = model.to(device)
     model.eval()
     return model, device
 
-# Initialize model
+# Initialize model safely
 try:
     model, device = load_ai_model()
 except Exception as e:
@@ -35,7 +39,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
     width, height = image.size
     
-    # Show image metrics
+    # Show image metrics side by side
     col1, col2 = st.columns(2)
     with col1:
         st.image(image, caption="Original Image Preview", use_container_width=True)
@@ -63,7 +67,6 @@ if uploaded_file is not None:
         current_tile = 0
         
         status_text.text("⚙️ Processing image grid patches...")
-        
         start_time = time.time()
         
         # 5. Grid Processing Loop with Progress Reporting
@@ -85,7 +88,7 @@ if uploaded_file is not None:
                     inputs = ImageLoader.load_image(tile).to(device)
                     preds = model(inputs)
                     
-                    # Reconstruct tensor patch back to PIL image
+                    # Reconstruct tensor patch back to PIL image array
                     tile_output = preds.squeeze(0).permute(1, 2, 0).cpu().numpy()
                     tile_output = (tile_output * 255).clip(0, 255).astype('uint8')
                     tile_img = Image.fromarray(tile_output)
@@ -100,7 +103,7 @@ if uploaded_file is not None:
         progress_bar.empty()
         status_text.success(f"✅ Success! Enhanced in {duration} seconds.")
         
-        # Display the result side-by-side
+        # Display the result
         st.image(output_image, caption="Enhanced 2x High-Res Output", use_container_width=True)
         
         # 6. Save image to memory loop for immediate local download browser hook
